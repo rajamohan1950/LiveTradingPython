@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: live-trading-python
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: LOG_LEVEL
+        value: INFO
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        value: 6379
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: KITE_API_KEY
+        sync: false
+      - key: KITE_ACCESS_TOKEN
+        sync: false
+      - key: TEST_MODE_ENABLED
+        value: "true"
+      - key: TEST_USERNAME
+        value: demo_user
+      - key: TEST_PASSWORD
+        value: demo123
+
+databases:
+  - name: live-trading-redis
+    plan: starter
+    ipAllowList: []
+
