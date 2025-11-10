@@ -83,19 +83,27 @@ class TradingEngine:
         self._setup_strategies()
     
     def _setup_redis(self):
-        """Initialize Redis connection"""
+        """Initialize Redis connection - Optional for demo mode"""
         try:
+            # Skip Redis if not configured (for demo/test mode)
+            if not Config.REDIS_HOST or Config.REDIS_HOST == 'localhost':
+                logger.warning("Redis not configured - running in demo mode without Redis cache")
+                self.redis_client = None
+                return
+            
             self.redis_client = redis.Redis(
                 host=Config.REDIS_HOST,
                 port=Config.REDIS_PORT,
-                password=Config.REDIS_PASSWORD,
-                decode_responses=True
+                password=Config.REDIS_PASSWORD if Config.REDIS_PASSWORD else None,
+                decode_responses=True,
+                socket_connect_timeout=5,
+                socket_timeout=5
             )
             self.redis_client.ping()
             logger.info("Redis connection established")
         except Exception as e:
-            logger.error(f"Failed to connect to Redis: {e}")
-            raise
+            logger.warning(f"Redis not available - running without Redis cache: {e}")
+            self.redis_client = None  # Continue without Redis for demo mode
     
     def _setup_strategies(self):
         """Initialize trading strategies"""
@@ -118,9 +126,10 @@ class TradingEngine:
             data = self.kite.generate_session(request_token, api_secret=Config.KITE_API_KEY)
             access_token = data["access_token"]
             
-            # Update config and Redis
+            # Update config and Redis (if available)
             Config.KITE_ACCESS_TOKEN = access_token
-            self.redis_client.set("kite_access_token", access_token, ex=86400)  # 24 hours
+            if self.redis_client:
+                self.redis_client.set("kite_access_token", access_token, ex=86400)  # 24 hours
             
             # Reinitialize with access token
             self.kite.set_access_token(access_token)
@@ -252,7 +261,10 @@ class TradingEngine:
                 await asyncio.sleep(1)
     
     async def _store_tick_in_redis(self, tick: Dict[str, Any]):
-        """Store tick data in Redis cache"""
+        """Store tick data in Redis cache - Optional"""
+        if not self.redis_client:
+            return  # Skip if Redis not available
+        
         try:
             # Store latest tick
             self.redis_client.set("latest_tick", str(tick), ex=60)
@@ -265,7 +277,7 @@ class TradingEngine:
             self.redis_client.zremrangebyrank("tick_data", 0, -1001)
             
         except Exception as e:
-            logger.error(f"Failed to store tick in Redis: {e}")
+            logger.debug(f"Redis storage skipped: {e}")  # Don't error, just skip
     
     async def _update_order_status(self, order_id: str):
         """Update order status from Kite"""

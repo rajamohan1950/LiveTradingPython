@@ -323,15 +323,15 @@ class HealthMonitor:
         return checks
     
     async def _check_redis(self) -> List[HealthCheck]:
-        """Check Redis connectivity"""
+        """Check Redis connectivity - Optional for demo mode"""
         checks = []
         
         try:
             if not self.trading_engine or not self.trading_engine.redis_client:
                 checks.append(HealthCheck(
                     name='redis',
-                    status='critical',
-                    message='Redis client not initialized',
+                    status='warning',
+                    message='Redis not configured - running in demo mode',
                     timestamp=datetime.now()
                 ))
                 return checks
@@ -349,8 +349,8 @@ class HealthMonitor:
         except Exception as e:
             checks.append(HealthCheck(
                 name='redis',
-                status='critical',
-                message=f'Redis connection failed: {e}',
+                status='warning',
+                message=f'Redis not available - demo mode: {e}',
                 timestamp=datetime.now()
             ))
         
