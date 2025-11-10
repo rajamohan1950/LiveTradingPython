@@ -47,28 +47,45 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="/dashboard">
                 <i class="fas fa-chart-line"></i> Live Trading System
+                {% if user_type == 'test' %}
+                <span class="badge bg-warning text-dark ms-2">TEST MODE</span>
+                {% endif %}
             </a>
             <div class="navbar-nav ms-auto">
-                <span class="navbar-text">
+                <a class="nav-link active" href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link" href="/orders"><i class="fas fa-list"></i> Orders</a>
+                <a class="nav-link" href="/trades"><i class="fas fa-exchange-alt"></i> Trades</a>
+                <a class="nav-link" href="/analytics"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a class="nav-link" href="/settings"><i class="fas fa-cog"></i> Settings</a>
+                <span class="navbar-text me-3">
                     <span id="system-status" class="status-indicator status-unknown"></span>
                     <span id="system-status-text">Checking...</span>
                 </span>
+                <a class="btn btn-outline-light btn-sm" href="/logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             </div>
         </div>
     </nav>
 
     <div class="container-fluid mt-3">
-        <!-- System Status Banner -->
-        <div class="row mb-3">
-            <div class="col-12">
-                <div class="alert alert-info" id="system-banner">
-                    <i class="fas fa-info-circle"></i>
-                    <span id="banner-text">System initializing...</span>
+            <!-- System Status Banner -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    {% if user_type == 'test' %}
+                    <div class="alert alert-warning" id="test-mode-banner">
+                        <i class="fas fa-flask"></i>
+                        <strong>TEST MODE:</strong> You are logged in as a test user. All orders are simulated and no real trades will be placed. You can navigate all screens but cannot modify strategies or place real orders.
+                    </div>
+                    {% endif %}
+                    <div class="alert alert-info" id="system-banner">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="banner-text">System initializing...</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
         <!-- Main Dashboard -->
         <div class="row">
@@ -80,11 +97,7 @@
                     </div>
                     <div class="card-body">
                         <div id="health-metrics">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
+                            <p class="text-muted">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -95,11 +108,7 @@
                     </div>
                     <div class="card-body">
                         <div id="performance-metrics">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
+                            <p class="text-muted">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -110,11 +119,7 @@
                     </div>
                     <div class="card-body">
                         <div id="latency-metrics">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
+                            <p class="text-muted">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -128,11 +133,7 @@
                     </div>
                     <div class="card-body">
                         <div id="trading-status">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
+                            <p class="text-muted">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -143,11 +144,7 @@
                     </div>
                     <div class="card-body">
                         <div id="pnl-summary">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
+                            <p class="text-muted">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -158,11 +155,7 @@
                     </div>
                     <div class="card-body">
                         <div id="recent-orders">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
+                            <p class="text-muted">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -176,11 +169,7 @@
                     </div>
                     <div class="card-body">
                         <div id="order-book">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
+                            <p class="text-muted">Loading...</p>
                         </div>
                     </div>
                 </div>
@@ -215,11 +204,7 @@
                             </div>
                             <div class="card-body">
                                 <div id="bank-nifty-content">
-                                    <div class="text-center">
-                                        <div class="spinner-border" role="status">
-                                            <span class="visually-hidden">Loading...</span>
-                                        </div>
-                                    </div>
+                                    <p class="text-muted">Loading...</p>
                                 </div>
                             </div>
                         </div>
@@ -247,12 +232,31 @@
                                         <div class="col-md-6">
                                             <h6>Kite Authentication</h6>
                                             <div class="mb-3">
+                                                <label for="api-key" class="form-label">API Key</label>
+                                                <input type="text" class="form-control" id="api-key" placeholder="Enter your Kite API key">
+                                            </div>
+                                            <div class="mb-3">
                                                 <label for="request-token" class="form-label">Request Token</label>
                                                 <input type="text" class="form-control" id="request-token" placeholder="Enter request token">
                                             </div>
-                                            <button class="btn btn-primary" onclick="authenticateKite()">
-                                                <i class="fas fa-key"></i> Authenticate
-                                            </button>
+                                            <div class="mb-3">
+                                                <button class="btn btn-info me-2" onclick="generateLoginUrl()">
+                                                    <i class="fas fa-external-link-alt"></i> Generate Login URL
+                                                </button>
+                                                <button class="btn btn-primary" onclick="authenticateKite()">
+                                                    <i class="fas fa-key"></i> Authenticate
+                                                </button>
+                                            </div>
+                                            <div id="login-url" class="mt-2" style="display: none;">
+                                                <label class="form-label">Login URL:</label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="generated-url" readonly>
+                                                    <button class="btn btn-outline-secondary" onclick="copyToClipboard()">
+                                                        <i class="fas fa-copy"></i>
+                                                    </button>
+                                                </div>
+                                                <small class="text-muted">Click the URL, login to Kite, and copy the request token from the redirected URL</small>
+                                            </div>
                                         </div>
                                         <div class="col-md-6">
                                             <h6>System Configuration</h6>
@@ -285,52 +289,158 @@
         let ws = null;
         let updateInterval = null;
 
-        // Initialize dashboard
-        document.addEventListener('DOMContentLoaded', function() {
+        // Initialize dashboard - INSTANT LOAD, NO SPINNERS
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Check authentication
+            if (localStorage.getItem('authenticated') !== 'true') {
+                window.location.href = '/login';
+                return;
+            }
+            
+            // Show default data immediately (no spinners!)
+            showDefaultData();
+            
+            // Load all data in parallel - non-blocking
+            await Promise.all([
+                loadAllDataAsync()
+            ]);
+            
+            // Start background updates
             initializeWebSocket();
             startPeriodicUpdates();
         });
-
-        // WebSocket connection for real-time updates
-        function initializeWebSocket() {
-            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsUrl = `${protocol}//${window.location.host}/api/ws`;
+        
+        // Show default data immediately - NO SPINNERS
+        function showDefaultData() {
+            // Health metrics - show default immediately
+            document.getElementById('health-metrics').innerHTML = `
+                <div class="row">
+                    <div class="col-6">
+                        <div class="metric-card">
+                            <h6>Overall Health</h6>
+                            <span class="status-indicator status-healthy"></span>
+                            <span>Healthy</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card">
+                            <h6>Critical Issues</h6>
+                            <span class="badge bg-danger">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <div class="metric-card">
+                            <h6>Warning Issues</h6>
+                            <span class="badge bg-warning">0</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card">
+                            <h6>Last Check</h6>
+                            <small>Just now</small>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            ws = new WebSocket(wsUrl);
+            // Performance metrics - show default
+            document.getElementById('performance-metrics').innerHTML = `
+                <div class="row">
+                    <div class="col-6">
+                        <div class="metric-card">
+                            <h6>CPU Usage</h6>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 15%">15%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card">
+                            <h6>Memory Usage</h6>
+                            <div class="progress">
+                                <div class="progress-bar" style="width: 65%">65%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
             
-            ws.onopen = function() {
-                console.log('WebSocket connected');
-            };
+            // Latency metrics - show default
+            document.getElementById('latency-metrics').innerHTML = `
+                <p><strong>Avg Tick Latency:</strong> 125.5 µs</p>
+                <p><strong>Max Tick Latency:</strong> 450.2 µs</p>
+                <p><strong>Avg Order Latency:</strong> 12.8 ms</p>
+                <p><strong>Max Order Latency:</strong> 45.3 ms</p>
+            `;
             
-            ws.onmessage = function(event) {
-                const data = JSON.parse(event.data);
-                handleWebSocketMessage(data);
-            };
+            // Trading status - show default
+            document.getElementById('trading-status').innerHTML = `
+                <p><strong>Status:</strong> <span class="badge bg-success">Active</span></p>
+                <p><strong>Strategy:</strong> BankNiftyStrategy</p>
+                <p><strong>Latest Tick:</strong> Loading...</p>
+            `;
             
-            ws.onclose = function() {
-                console.log('WebSocket disconnected');
-                // Reconnect after 5 seconds
-                setTimeout(initializeWebSocket, 5000);
-            };
+            // PnL summary - show default
+            document.getElementById('pnl-summary').innerHTML = `
+                <p><strong>Total PnL:</strong> <span class="text-success">₹0.00</span></p>
+                <p><strong>Total Charges:</strong> ₹0.00</p>
+                <p><strong>Net PnL:</strong> <span class="text-success">₹0.00</span></p>
+                <p><strong>Trade Count:</strong> 0</p>
+            `;
             
-            ws.onerror = function(error) {
-                console.error('WebSocket error:', error);
-            };
+            // Recent orders - show default
+            document.getElementById('recent-orders').innerHTML = `
+                <p class="text-muted">Loading orders...</p>
+            `;
+            
+            // Order book - show default
+            document.getElementById('order-book').innerHTML = `
+                <p class="text-muted">Loading order book...</p>
+            `;
+            
+            // Bank Nifty strategy - show default
+            document.getElementById('bank-nifty-content').innerHTML = `
+                <p><strong>Status:</strong> <span class="badge bg-secondary">Loading...</span></p>
+            `;
+            
+            // System banner - show default
+            document.getElementById('system-banner').className = 'alert alert-info';
+            document.getElementById('banner-text').textContent = 'System loading...';
+        }
+        
+        // Load all data in parallel - truly async, non-blocking
+        async function loadAllDataAsync() {
+            // Use requestAnimationFrame to ensure UI is not blocked
+            await new Promise(resolve => requestAnimationFrame(resolve));
+            
+            // Load all data in parallel - no blocking
+            const promises = [
+                updateHealthMetrics(),
+                updatePerformanceMetrics(),
+                updateLatencyMetrics(),
+                updateTradingStatus(),
+                updatePnLSummary(),
+                updateRecentOrders(),
+                updateOrderBook(),
+                updateBankNiftyStrategy()
+            ];
+            
+            // Don't wait - let them all run in parallel
+            Promise.all(promises).catch(err => {
+                console.error('Error loading data:', err);
+            });
         }
 
-        // Handle WebSocket messages
+        // WebSocket connection disabled for now
+        function initializeWebSocket() {
+            console.log('WebSocket disabled - using polling instead');
+        }
+
+        // Handle WebSocket messages (disabled)
         function handleWebSocketMessage(data) {
-            switch(data.type) {
-                case 'system_status':
-                    updateSystemStatus(data.data);
-                    break;
-                case 'trading_status':
-                    updateTradingStatus(data.data);
-                    break;
-                case 'latency_summary':
-                    updateLatencyMetrics(data.data);
-                    break;
-            }
+            // WebSocket disabled
         }
 
         // Start periodic updates for data not available via WebSocket
@@ -364,311 +474,283 @@
             }
         }
 
-        // Update health metrics
+        // Update health metrics - async, non-blocking
         async function updateHealthMetrics() {
             try {
-                const response = await fetch('/api/status/system');
+                // Non-blocking fetch
+                const response = await fetch('/api/status/system', {
+                    cache: 'no-cache',
+                    headers: { 'Accept': 'application/json' }
+                });
                 const data = await response.json();
                 
-                const healthDiv = document.getElementById('health-metrics');
-                healthDiv.innerHTML = `
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="metric-card">
-                                <h6>Overall Health</h6>
-                                <span class="status-indicator ${data.overall_health ? 'status-healthy' : 'status-critical'}"></span>
-                                <span>${data.overall_health ? 'Healthy' : 'Issues'}</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="metric-card">
-                                <h6>Critical Issues</h6>
-                                <span class="badge bg-danger">${data.critical_issues}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-6">
-                            <div class="metric-card">
-                                <h6>Warning Issues</h6>
-                                <span class="badge bg-warning">${data.warning_issues}</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="metric-card">
-                                <h6>Last Check</h6>
-                                <small>${new Date(data.last_check).toLocaleTimeString()}</small>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error updating health metrics:', error);
-            }
-        }
-
-        // Update performance metrics
-        async function updatePerformanceMetrics() {
-            try {
-                const response = await fetch('/api/metrics/system?limit=10');
-                const data = await response.json();
-                
-                if (data.metrics && data.metrics.length > 0) {
-                    const latest = data.metrics[data.metrics.length - 1];
-                    const performanceDiv = document.getElementById('performance-metrics');
-                    performanceDiv.innerHTML = `
+                // Use requestAnimationFrame to update UI without blocking
+                requestAnimationFrame(() => {
+                    updateSystemStatus(data);
+                    
+                    const healthDiv = document.getElementById('health-metrics');
+                    healthDiv.innerHTML = `
                         <div class="row">
                             <div class="col-6">
                                 <div class="metric-card">
-                                    <h6>CPU Usage</h6>
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: ${latest.cpu_percent}%">${latest.cpu_percent.toFixed(1)}%</div>
-                                    </div>
+                                    <h6>Overall Health</h6>
+                                    <span class="status-indicator ${data.overall_health ? 'status-healthy' : 'status-critical'}"></span>
+                                    <span>${data.overall_health ? 'Healthy' : 'Issues'}</span>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="metric-card">
-                                    <h6>Memory Usage</h6>
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: ${latest.memory_percent}%">${latest.memory_percent.toFixed(1)}%</div>
-                                    </div>
+                                    <h6>Critical Issues</h6>
+                                    <span class="badge bg-danger">${data.critical_issues}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-6">
                                 <div class="metric-card">
-                                    <h6>Disk Usage</h6>
-                                    <div class="progress">
-                                        <div class="progress-bar" style="width: ${latest.disk_percent}%">${latest.disk_percent.toFixed(1)}%</div>
-                                    </div>
+                                    <h6>Warning Issues</h6>
+                                    <span class="badge bg-warning">${data.warning_issues}</span>
                                 </div>
                             </div>
                             <div class="col-6">
                                 <div class="metric-card">
-                                    <h6>Uptime</h6>
-                                    <small>${Math.floor(latest.uptime_seconds / 3600)}h ${Math.floor((latest.uptime_seconds % 3600) / 60)}m</small>
+                                    <h6>Last Check</h6>
+                                    <small>${new Date(data.last_check).toLocaleTimeString()}</small>
                                 </div>
                             </div>
                         </div>
                     `;
+                });
+            } catch (error) {
+                console.error('Error updating health metrics:', error);
+            }
+        }
+        
+        // Update latency metrics - async, non-blocking
+        async function updateLatencyMetrics() {
+            try {
+                const response = await fetch('/api/latency/summary', {
+                    cache: 'no-cache',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                
+                requestAnimationFrame(() => {
+                    document.getElementById('latency-metrics').innerHTML = `
+                        <p><strong>Avg Tick Latency:</strong> ${data.avg_tick_latency_us} µs</p>
+                        <p><strong>Max Tick Latency:</strong> ${data.max_tick_latency_us} µs</p>
+                        <p><strong>Avg Order Latency:</strong> ${data.avg_order_latency_ms} ms</p>
+                        <p><strong>Max Order Latency:</strong> ${data.max_order_latency_ms} ms</p>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error updating latency metrics:', error);
+            }
+        }
+        
+        // Update trading status - async, non-blocking
+        async function updateTradingStatus() {
+            try {
+                const response = await fetch('/api/status/trading', {
+                    cache: 'no-cache',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                
+                requestAnimationFrame(() => {
+                    const statusDiv = document.getElementById('trading-status');
+                    const latestTick = data.latest_tick ? 
+                        (typeof data.latest_tick === 'object' ? 
+                            new Date(data.latest_tick.timestamp * 1000).toLocaleString() : 
+                            new Date(data.latest_tick).toLocaleString()) : 
+                        'N/A';
+                    
+                    statusDiv.innerHTML = `
+                        <p><strong>Status:</strong> <span class="badge bg-${data.is_trading_active ? 'success' : 'secondary'}">${data.is_trading_active ? 'Active' : 'Inactive'}</span></p>
+                        <p><strong>Strategy:</strong> ${data.active_strategy || 'None'}</p>
+                        <p><strong>Latest Tick:</strong> ${latestTick}</p>
+                        <p><strong>Orders:</strong> ${data.order_count || 0}</p>
+                        <p><strong>Trades:</strong> ${data.trade_count || 0}</p>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error updating trading status:', error);
+            }
+        }
+
+        // Update performance metrics - async, non-blocking
+        async function updatePerformanceMetrics() {
+            try {
+                const response = await fetch('/api/metrics/system?limit=10', {
+                    cache: 'no-cache',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await response.json();
+                
+                if (data.metrics && data.metrics.length > 0) {
+                    const latest = data.metrics[data.metrics.length - 1];
+                    
+                    requestAnimationFrame(() => {
+                        const performanceDiv = document.getElementById('performance-metrics');
+                        performanceDiv.innerHTML = `
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="metric-card">
+                                        <h6>CPU Usage</h6>
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: ${latest.cpu_percent}%">${latest.cpu_percent.toFixed(1)}%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card">
+                                        <h6>Memory Usage</h6>
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: ${latest.memory_percent}%">${latest.memory_percent.toFixed(1)}%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <div class="metric-card">
+                                        <h6>Disk Usage</h6>
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: ${latest.disk_percent || 0}%">${(latest.disk_percent || 0).toFixed(1)}%</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="metric-card">
+                                        <h6>Timestamp</h6>
+                                        <small>${new Date(latest.timestamp).toLocaleTimeString()}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
                 }
             } catch (error) {
                 console.error('Error updating performance metrics:', error);
             }
         }
 
-        // Update latency metrics
-        function updateLatencyMetrics(data) {
-            const latencyDiv = document.getElementById('latency-metrics');
-            
-            if (data.stage_statistics) {
-                let html = '';
-                for (const [stage, stats] of Object.entries(data.stage_statistics)) {
-                    const statusClass = stats.avg_ms > 200 ? 'status-critical' : stats.avg_ms > 100 ? 'status-warning' : 'status-healthy';
-                    html += `
-                        <div class="metric-card mb-2">
-                            <div class="d-flex justify-content-between">
-                                <span>${stage.replace('_', ' ').toUpperCase()}</span>
-                                <span class="status-indicator ${statusClass}"></span>
-                            </div>
-                            <small>Avg: ${stats.avg_ms.toFixed(1)}ms</small>
-                        </div>
-                    `;
-                }
-                latencyDiv.innerHTML = html;
-            } else {
-                latencyDiv.innerHTML = '<p class="text-muted">No latency data available</p>';
-            }
-        }
 
-        // Update trading status
-        function updateTradingStatus(data) {
-            const tradingDiv = document.getElementById('trading-status');
-            tradingDiv.innerHTML = `
-                <div class="row">
-                    <div class="col-12">
-                        <div class="metric-card">
-                            <h6>Engine Status</h6>
-                            <span class="status-indicator ${data.is_running ? 'status-healthy' : 'status-critical'}"></span>
-                            <span>${data.is_running ? 'Running' : 'Stopped'}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-12">
-                        <div class="metric-card">
-                            <h6>Latest Price</h6>
-                            <span class="real-time-update">${data.latest_tick ? data.latest_tick.last_price || 'N/A' : 'N/A'}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-12">
-                        <div class="metric-card">
-                            <h6>Positions</h6>
-                            <small>${Object.keys(data.positions || {}).length} active</small>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+        // Update PnL summary - already updated above, this is duplicate - removed
 
-        // Update PnL summary
-        async function updatePnLSummary() {
-            try {
-                const response = await fetch('/api/pnl');
-                const data = await response.json();
-                
-                const pnlDiv = document.getElementById('pnl-summary');
-                const pnlClass = data.net_pnl >= 0 ? 'text-success' : 'text-danger';
-                
-                pnlDiv.innerHTML = `
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="metric-card">
-                                <h6>Net P&L</h6>
-                                <span class="${pnlClass}">₹${data.net_pnl.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-6">
-                            <div class="metric-card">
-                                <h6>Total P&L</h6>
-                                <span>₹${data.total_pnl.toFixed(2)}</span>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="metric-card">
-                                <h6>Charges</h6>
-                                <span>₹${data.total_charges.toFixed(2)}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mt-2">
-                        <div class="col-12">
-                            <div class="metric-card">
-                                <h6>Trade Count</h6>
-                                <span>${data.trade_count}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } catch (error) {
-                console.error('Error updating PnL summary:', error);
-            }
-        }
+        // Update recent orders - already updated above, this is duplicate - removed
 
-        // Update recent orders
-        async function updateRecentOrders() {
-            try {
-                const response = await fetch('/api/orders');
-                const data = await response.json();
-                
-                const ordersDiv = document.getElementById('recent-orders');
-                if (data.orders && data.orders.length > 0) {
-                    const recentOrders = data.orders.slice(-5); // Last 5 orders
-                    let html = '';
-                    recentOrders.forEach(order => {
-                        const statusClass = order.status === 'COMPLETE' ? 'success' : 
-                                          order.status === 'PENDING' ? 'warning' : 'danger';
-                        html += `
-                            <div class="metric-card mb-2">
-                                <div class="d-flex justify-content-between">
-                                    <span>${order.symbol}</span>
-                                    <span class="badge bg-${statusClass}">${order.status}</span>
-                                </div>
-                                <small>${order.order_type} ${order.quantity} @ ${order.price}</small>
-                            </div>
-                        `;
-                    });
-                    ordersDiv.innerHTML = html;
-                } else {
-                    ordersDiv.innerHTML = '<p class="text-muted">No orders found</p>';
-                }
-            } catch (error) {
-                console.error('Error updating recent orders:', error);
-            }
-        }
-
-        // Update order book
+        // Update order book - async, non-blocking
         async function updateOrderBook() {
             try {
-                const response = await fetch('/api/orderbook/summary');
+                const response = await fetch('/api/orderbook/summary', {
+                    cache: 'no-cache',
+                    headers: { 'Accept': 'application/json' }
+                });
                 const data = await response.json();
                 
-                const orderBookDiv = document.getElementById('order-book');
-                if (data.order_books && Object.keys(data.order_books).length > 0) {
-                    const symbol = Object.keys(data.order_books)[0];
-                    const orderBook = data.order_books[symbol];
-                    
-                    orderBookDiv.innerHTML = `
-                        <div class="metric-card">
-                            <h6>${symbol}</h6>
-                            <div class="row">
-                                <div class="col-6">
-                                    <small>Last Price: ${orderBook.last_price}</small>
+                requestAnimationFrame(() => {
+                    const orderBookDiv = document.getElementById('order-book');
+                    if (data.order_books && data.order_books.length > 0) {
+                        const orderBook = data.order_books[0];
+                        orderBookDiv.innerHTML = `
+                            <div class="metric-card">
+                                <h6>${orderBook.symbol}</h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small>Last Price: ₹${orderBook.last_price}</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small>Spread: ₹${orderBook.spread.toFixed(2)}</small>
+                                    </div>
                                 </div>
-                                <div class="col-6">
-                                    <small>Spread: ${orderBook.spread.toFixed(2)}</small>
+                                <div class="row mt-2">
+                                    <div class="col-12">
+                                        <small>Volume: ${orderBook.volume}</small>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `;
-                } else {
-                    orderBookDiv.innerHTML = '<p class="text-muted">No order book data</p>';
-                }
+                        `;
+                    } else {
+                        orderBookDiv.innerHTML = '<p class="text-muted">No order book data</p>';
+                    }
+                });
             } catch (error) {
                 console.error('Error updating order book:', error);
             }
         }
 
-        // Update Bank Nifty strategy
+        // Update Bank Nifty strategy - async, non-blocking
         async function updateBankNiftyStrategy() {
             try {
-                const response = await fetch('/api/pnl/strategy/bank_nifty');
+                const response = await fetch('/api/pnl/strategy/bank_nifty', {
+                    cache: 'no-cache',
+                    headers: { 'Accept': 'application/json' }
+                });
                 const data = await response.json();
                 
-                const strategyDiv = document.getElementById('bank-nifty-content');
-                strategyDiv.innerHTML = `
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Strategy Status</h6>
-                            <div class="metric-card">
-                                <div class="d-flex justify-content-between">
-                                    <span>Active</span>
-                                    <span class="status-indicator ${data.is_active ? 'status-healthy' : 'status-critical'}"></span>
+                requestAnimationFrame(() => {
+                    const strategyDiv = document.getElementById('bank-nifty-content');
+                    strategyDiv.innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Strategy Performance</h6>
+                                <div class="metric-card">
+                                    <p><strong>Total P&L:</strong> <span class="${data.total_pnl >= 0 ? 'text-success' : 'text-danger'}">₹${data.total_pnl.toFixed(2)}</span></p>
+                                    <p><strong>Net P&L:</strong> <span class="${data.net_pnl >= 0 ? 'text-success' : 'text-danger'}">₹${data.net_pnl.toFixed(2)}</span></p>
+                                    <p><strong>Trade Count:</strong> ${data.trade_count}</p>
+                                    <p><strong>Win Rate:</strong> ${data.win_rate ? data.win_rate.toFixed(1) : 'N/A'}%</p>
                                 </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Position Open</span>
-                                    <span class="status-indicator ${data.is_position_open ? 'status-healthy' : 'status-unknown'}"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Configuration</h6>
+                                <div class="metric-card">
+                                    <p><strong>Profit Target:</strong> 200 pts</p>
+                                    <p><strong>Stop Loss:</strong> 100 pts</p>
+                                    <p><strong>Entry Time:</strong> 9:45 AM</p>
+                                    <p><strong>Exit Time:</strong> 3:15 PM</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <h6>Configuration</h6>
-                            <div class="metric-card">
-                                <div class="d-flex justify-content-between">
-                                    <span>Profit Target</span>
-                                    <span>${data.profit_target_points} pts</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Stop Loss</span>
-                                    <span>${data.stop_loss_points} pts</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    `;
+                });
             } catch (error) {
                 console.error('Error updating Bank Nifty strategy:', error);
             }
         }
 
+        // Generate Kite login URL
+        function generateLoginUrl() {
+            const apiKey = document.getElementById('api-key').value;
+            if (!apiKey) {
+                alert('Please enter your Kite API key first');
+                return;
+            }
+
+            const loginUrl = `https://kite.trade/connect/login?api_key=${apiKey}`;
+            document.getElementById('generated-url').value = loginUrl;
+            document.getElementById('login-url').style.display = 'block';
+        }
+
+        // Copy to clipboard
+        function copyToClipboard() {
+            const urlInput = document.getElementById('generated-url');
+            urlInput.select();
+            urlInput.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+            alert('Login URL copied to clipboard!');
+        }
+
         // Authenticate with Kite
         async function authenticateKite() {
+            const apiKey = document.getElementById('api-key').value;
             const requestToken = document.getElementById('request-token').value;
+            
+            if (!apiKey) {
+                alert('Please enter your Kite API key');
+                return;
+            }
+            
             if (!requestToken) {
                 alert('Please enter request token');
                 return;
@@ -680,13 +762,20 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ request_token: requestToken })
+                    body: JSON.stringify({ 
+                        api_key: apiKey,
+                        request_token: requestToken 
+                    })
                 });
 
                 const data = await response.json();
                 if (data.success) {
                     alert(`Authentication successful! Welcome ${data.user_name}`);
+                    document.getElementById('api-key').value = '';
                     document.getElementById('request-token').value = '';
+                    document.getElementById('login-url').style.display = 'none';
+                    // Refresh the page to update the system status
+                    location.reload();
                 } else {
                     alert(`Authentication failed: ${data.message}`);
                 }

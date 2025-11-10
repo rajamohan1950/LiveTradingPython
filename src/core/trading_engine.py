@@ -337,9 +337,29 @@ class TradingEngine:
         return current_time >= market_close
     
     async def place_order(self, symbol: str, quantity: int, order_type: str, 
-                         product: str, price: float = None) -> Optional[str]:
+                         product: str, price: float = None, user_type: str = 'real') -> Optional[str]:
         """Place order through Kite"""
         try:
+            # Block order placement for test users
+            if user_type == 'test':
+                logger.warning(f"TEST MODE: Order placement blocked for test user. Would place: {order_type} {quantity} {symbol}")
+                # Create simulated order for test users
+                import uuid
+                order_id = f"TEST_{uuid.uuid4().hex[:8]}"
+                order = Order(
+                    order_id=order_id,
+                    symbol=symbol,
+                    quantity=quantity,
+                    price=price or 0,
+                    order_type=order_type,
+                    product=product,
+                    status=OrderStatus.PENDING,
+                    timestamp=datetime.now()
+                )
+                self.orders[order_id] = order
+                logger.info(f"TEST MODE: Simulated order created: {order_id}")
+                return order_id
+            
             if not self.kite:
                 logger.error("Kite not authenticated")
                 return None

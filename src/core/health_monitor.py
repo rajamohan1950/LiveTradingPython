@@ -467,8 +467,8 @@ class HealthMonitor:
     async def _send_email_alert(self, alert_type: str, checks: List[HealthCheck]):
         """Send email alert"""
         try:
-            if not Config.EMAIL_USERNAME or not Config.EMAIL_PASSWORD:
-                logger.warning("Email credentials not configured")
+            if not Config.EMAIL_USERNAME or not Config.EMAIL_PASSWORD or Config.EMAIL_USERNAME == 'your_email@gmail.com':
+                logger.warning("Email credentials not configured - skipping email alert")
                 return
             
             # Create message

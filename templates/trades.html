@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trades - Live Trading System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .pnl-positive { color: #28a745; font-weight: bold; }
+        .pnl-negative { color: #dc3545; font-weight: bold; }
+        .pnl-zero { color: #6c757d; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="fas fa-chart-line"></i> Live Trading System
+                {% if user_type == 'test' %}
+                <span class="badge bg-warning text-dark ms-2">TEST MODE</span>
+                {% endif %}
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link" href="/orders"><i class="fas fa-list"></i> Orders</a>
+                <a class="nav-link active" href="/trades"><i class="fas fa-exchange-alt"></i> Trades</a>
+                <a class="nav-link" href="/analytics"><i class="fas fa-chart-bar"></i> Analytics</a>
+                <a class="nav-link" href="/settings"><i class="fas fa-cog"></i> Settings</a>
+                <a class="btn btn-outline-light btn-sm ms-2" href="/logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        {% if user_type == 'test' %}
+        <div class="alert alert-warning mb-3">
+            <i class="fas fa-flask"></i>
+            <strong>TEST MODE:</strong> All trades shown are simulated. No real trades are being executed.
+        </div>
+        {% endif %}
+
+        <!-- PnL Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total P&L</h6>
+                        <h3 id="total-pnl">₹0.00</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Net P&L</h6>
+                        <h3 id="net-pnl">₹0.00</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total Charges</h6>
+                        <h3 id="total-charges">₹0.00</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">Trade Count</h6>
+                        <h3 id="trade-count">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trades Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4><i class="fas fa-exchange-alt"></i> Trade History</h4>
+                        <button class="btn btn-sm btn-outline-primary" onclick="refreshTrades()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Trade ID</th>
+                                        <th>Order ID</th>
+                                        <th>Symbol</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>P&L</th>
+                                        <th>Charges</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trades-table">
+                                    <tr>
+                                        <td colspan="8" class="text-center">
+                                            <div class="spinner-border" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function formatPnl(pnl) {
+            const pnlClass = pnl > 0 ? 'pnl-positive' : pnl < 0 ? 'pnl-negative' : 'pnl-zero';
+            const sign = pnl >= 0 ? '+' : '';
+            return `<span class="${pnlClass}">${sign}₹${pnl.toFixed(2)}</span>`;
+        }
+
+        async function loadPnL() {
+            try {
+                const response = await fetch('/api/pnl');
+                const data = await response.json();
+                
+                document.getElementById('total-pnl').innerHTML = formatPnl(data.total_pnl);
+                document.getElementById('net-pnl').innerHTML = formatPnl(data.net_pnl);
+                document.getElementById('total-charges').textContent = `₹${data.total_charges.toFixed(2)}`;
+                document.getElementById('trade-count').textContent = data.trade_count;
+            } catch (error) {
+                console.error('Error loading PnL:', error);
+            }
+        }
+
+        async function loadTrades() {
+            try {
+                const response = await fetch('/api/trades');
+                const data = await response.json();
+                
+                const tbody = document.getElementById('trades-table');
+                
+                if (data.trades && data.trades.length > 0) {
+                    tbody.innerHTML = data.trades.map(trade => `
+                        <tr>
+                            <td><code>${trade.trade_id}</code></td>
+                            <td><code>${trade.order_id}</code></td>
+                            <td><strong>${trade.symbol}</strong></td>
+                            <td>${trade.quantity}</td>
+                            <td>₹${trade.price.toFixed(2)}</td>
+                            <td>${formatPnl(trade.pnl)}</td>
+                            <td>₹${trade.transaction_charges.toFixed(2)}</td>
+                            <td>${new Date(trade.timestamp).toLocaleString()}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No trades found</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error loading trades:', error);
+                document.getElementById('trades-table').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-danger">Error loading trades</td></tr>';
+            }
+        }
+
+        function refreshTrades() {
+            loadPnL();
+            loadTrades();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPnL();
+            loadTrades();
+            setInterval(() => {
+                loadPnL();
+                loadTrades();
+            }, 10000);
+        });
+    </script>
+</body>
+</html>
+

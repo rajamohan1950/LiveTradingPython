@@ -59,6 +59,10 @@ class KiteWebSocketClient:
             self.reconnect_attempts = 0
             
             logger.info("Connected to Kite WebSocket")
+            
+            # Subscribe to Bank Nifty futures after connection
+            await self.subscribe_bank_nifty()
+            
             return True
             
         except Exception as e:

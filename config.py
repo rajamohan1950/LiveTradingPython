@@ -6,6 +6,7 @@ load_dotenv()
 class Config:
     # Kite API Configuration
     KITE_API_KEY = os.getenv('KITE_API_KEY', '')
+    KITE_API_SECRET = os.getenv('KITE_API_SECRET', '')
     KITE_ACCESS_TOKEN = os.getenv('KITE_ACCESS_TOKEN', '')
     KITE_REQUEST_TOKEN = os.getenv('KITE_REQUEST_TOKEN', '')
     
@@ -44,3 +45,8 @@ class Config:
     LATENCY_LOG_FILE = os.path.join(DATA_DIR, 'latency_metrics.log')
     TRADE_LOG_FILE = os.path.join(DATA_DIR, 'trade_history.log')
     SYSTEM_LOG_FILE = os.path.join(DATA_DIR, 'system.log')
+    
+    # Test/Demo Mode Configuration
+    TEST_MODE_ENABLED = os.getenv('TEST_MODE_ENABLED', 'true').lower() == 'true'
+    TEST_USERNAME = os.getenv('TEST_USERNAME', 'demo_user')
+    TEST_PASSWORD = os.getenv('TEST_PASSWORD', 'demo123')

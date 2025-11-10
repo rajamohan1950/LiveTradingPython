@@ -172,12 +172,14 @@ class BankNiftyStrategy(StrategyAdapter):
                 await self._send_entry_notification(current_price)
                 
             else:
-                # Live trading
+                # Live trading - check if test user
+                user_type = getattr(trading_engine, 'user_type', 'real')
                 order_id = await trading_engine.place_order(
                     symbol=self.config.symbol,
                     quantity=self.config.quantity,
                     order_type='BUY',
-                    product='MIS'  # Intraday
+                    product='MIS',  # Intraday
+                    user_type=user_type
                 )
                 
                 if order_id:
@@ -211,12 +213,14 @@ class BankNiftyStrategy(StrategyAdapter):
                 logger.info(f"PAPER TRADE: Would place sell order at {target_price}")
                 self.profit_order_placed = True
             else:
+                user_type = getattr(trading_engine, 'user_type', 'real')
                 order_id = await trading_engine.place_order(
                     symbol=self.config.symbol,
                     quantity=self.config.quantity,
                     order_type='SELL',
                     product='MIS',
-                    price=target_price
+                    price=target_price,
+                    user_type=user_type
                 )
                 
                 if order_id:
@@ -238,12 +242,14 @@ class BankNiftyStrategy(StrategyAdapter):
                 logger.info(f"PAPER TRADE: Would place stop loss order at {stop_loss_price}")
                 self.stop_loss_order_placed = True
             else:
+                user_type = getattr(trading_engine, 'user_type', 'real')
                 order_id = await trading_engine.place_order(
                     symbol=self.config.symbol,
                     quantity=self.config.quantity,
                     order_type='SELL',
                     product='MIS',
-                    price=stop_loss_price
+                    price=stop_loss_price,
+                    user_type=user_type
                 )
                 
                 if order_id:
@@ -295,11 +301,13 @@ class BankNiftyStrategy(StrategyAdapter):
                     await trading_engine.cancel_order(self.stop_loss_order_id)
                 
                 # Place market exit order
+                user_type = getattr(trading_engine, 'user_type', 'real')
                 order_id = await trading_engine.place_order(
                     symbol=self.config.symbol,
                     quantity=self.config.quantity,
                     order_type='SELL',
-                    product='MIS'
+                    product='MIS',
+                    user_type=user_type
                 )
                 
                 if order_id:
