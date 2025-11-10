@@ -4,7 +4,7 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python main.py
-    plan: starter
+    plan: free
     healthCheckPath: /health
     envVars:
       - key: LOG_LEVEL
@@ -28,6 +28,6 @@ services:
 
 databases:
   - name: live-trading-redis
-    plan: starter
+    plan: free
     ipAllowList: []
 
