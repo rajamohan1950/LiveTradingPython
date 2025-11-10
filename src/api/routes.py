@@ -143,10 +143,10 @@ async def authenticate_kite(request: AuthRequest, engine=Depends(get_trading_eng
         os.environ['KITE_API_KEY'] = request.api_key
         os.environ['KITE_ACCESS_TOKEN'] = access_token
         
-            # Store in Redis if available
-            if engine.redis_client:
-                engine.redis_client.set("kite_api_key", request.api_key, ex=86400)
-                engine.redis_client.set("kite_access_token", access_token, ex=86400)
+        # Store in Redis if available
+        if engine.redis_client:
+            engine.redis_client.set("kite_api_key", request.api_key, ex=86400)
+            engine.redis_client.set("kite_access_token", access_token, ex=86400)
         
         # Reinitialize with access token
         engine.kite.set_access_token(access_token)
